@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adu.cookbook.dao.UserInfoMapper">
+
+	<sql id="baseCols">
+		id, user_name, sex, mobile, account, password, state, create_time, update_time
+	</sql>
+
+	<select id="queryUserInfoById" resultType="com.adu.cookbook.model.UserInfo">
+		SELECT
+		<include refid="baseCols" />
+		FROM user_info
+		WHERE id = #{id}
+	</select>
+
+	<select id="queryUserInfoByAccount" resultType="com.adu.cookbook.model.UserInfo">
+		SELECT
+		<include refid="baseCols" />
+		FROM user_info
+		WHERE account = #{account}
+	</select>
+
+	<insert id="addUser">
+		INSERT INTO
+		user_info(user_name, sex, mobile, account, password)
+		values
+		(#{userInfo.userName},#{userInfo.sex},#{userInfo.mobile},#{userInfo.account},#{userInfo.password})
+	</insert>
+
+</mapper>
