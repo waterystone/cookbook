@@ -36,8 +36,7 @@ public class userController {
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = {"application/json", "text/javascript;charset=UTF-8"})
     @ResponseBody
     public ApiResult login(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "account") String account,
-                           @RequestParam(value = "password") String password,
-                           @RequestParam(value = "srcUrl", required = false) String srcUrl) throws IOException {
+                           @RequestParam(value = "password") String password) throws IOException {
         logger.info("login_start,account={},password={}", account, password);
 
         UserInfo userInfo = userInfoService.getUserInfoByAccount(account);
@@ -50,7 +49,6 @@ public class userController {
 
 
         ResponseUtil.addCookie(response, CookieKeyConstant.USER_INFO, JsonUtil.toString(userInfo), CookieKeyConstant.USER_INFO_SECONDS);// 用户信息加入Cookie，标记登陆状态
-        response.sendRedirect(StringUtils.isEmpty(srcUrl) ? "/" : srcUrl);
         return ApiResult.SUCCESS;
     }
 

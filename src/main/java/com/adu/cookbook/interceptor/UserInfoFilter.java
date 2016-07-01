@@ -7,6 +7,9 @@ import com.adu.cookbook.util.JsonUtil;
 import com.adu.cookbook.util.RequestUtil;
 import com.adu.cookbook.util.ResponseUtil;
 import com.adu.cookbook.util.UserContext;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +17,16 @@ import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * 用户信息拦截器
  */
 public class UserInfoFilter implements Filter {
     private FilterConfig filterConfig;
+    private List<String> excludeUrls = Lists.newArrayList();//不拦截的URL
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -38,6 +44,9 @@ public class UserInfoFilter implements Filter {
             String key = (String) enumeration.nextElement();
             String value = this.filterConfig.getInitParameter(key);
             logger.info("[filterConfig-{}]{}={}", n++, key, value);
+            if (StringUtils.equals(key, "excludeUrls") && StringUtils.isNotEmpty(value)) {
+                this.excludeUrls = Splitter.on(",").splitToList(value);
+            }
         }
 
     }
@@ -45,11 +54,18 @@ public class UserInfoFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        HttpServletRequest httpServletRequest = RequestUtil.getHttpServletRequest(request);
+        if (this.excludeUrls.contains(httpServletRequest.getRequestURI())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String srcUrl = getSrcUrl(httpServletRequest);
+
         try {
             UserInfo userInfo = getUserInfoFromCookie(request);
             if (userInfo == null) {
-                String srcUrl = RequestUtil.getHttpServletRequest(request).getRequestURI();
-                ResponseUtil.getHttpServletResponse(response).sendRedirect("/login?srcUrl=" + srcUrl);
+                ResponseUtil.getHttpServletResponse(response).sendRedirect("/login?srcUrl=" + URLEncoder.encode(srcUrl, "UTF-8"));
                 return;
             }
 
@@ -59,6 +75,15 @@ public class UserInfoFilter implements Filter {
             UserContext.clear();
         }
 
+    }
+
+    private String getSrcUrl(HttpServletRequest httpServletRequest) {
+        String srcUrl = httpServletRequest.getRequestURI();
+        String queryString = httpServletRequest.getQueryString();
+        if (StringUtils.isNotEmpty(queryString)) {
+            srcUrl += "?" + queryString;
+        }
+        return srcUrl;
     }
 
     @Override
