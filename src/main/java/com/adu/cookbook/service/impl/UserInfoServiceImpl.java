@@ -25,7 +25,7 @@ public class UserInfoServiceImpl implements InitializingBean, UserInfoService {
     @Autowired
     private UserInfoMapper userInfoMapper;
 
-    private LoadingCache<String, UserInfo> cache;//缓存
+    private LoadingCache<String, UserInfo> cache;//缓存,key为account
     private static final int CACHE_SIZE_LIIMIT = 3000;//缓存的大小
     private static final int CACHE_TIME_LIMIT = 2 * 60 * 60;// 缓存的时间阈值(秒)。
 
@@ -49,12 +49,19 @@ public class UserInfoServiceImpl implements InitializingBean, UserInfoService {
 
     @Override
     public UserInfo getUserInfoByAccount(String account) {
+        UserInfo res = null;
+
         if (StringUtils.isEmpty(account)) {
             logger.error("[ERROR-getUserInfoByAccount-NULL-account]");
-            return null;
+            return res;
         }
 
-        return userInfoMapper.queryUserInfoByAccount(account);
+        try {
+            res = cache.get(account);
+        } catch (Exception e) {
+            res = userInfoMapper.queryUserInfoByAccount(account);
+        }
+        return res;
     }
 
     @Override

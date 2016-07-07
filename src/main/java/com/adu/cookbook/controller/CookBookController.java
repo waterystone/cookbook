@@ -54,6 +54,7 @@ public class CookBookController {
         List<CookBook> cookBookList = cookBookService.getCookBookByUserId(userInfo.getId(), null, null, null, null, true, offset, limit);
         clearContent(cookBookList);
 
+        logger.debug("getSlides_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
     }
 
@@ -76,6 +77,7 @@ public class CookBookController {
         List<CookBook> cookBookList = cookBookService.getCookBookByUserId(userInfo.getId(), null, null, null, null, false, offset, limit);
         clearContent(cookBookList);
 
+        logger.debug("getRecentBooks_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
     }
 
@@ -105,6 +107,7 @@ public class CookBookController {
         List<CookBook> cookBookList = cookBookByIds;
         clearContent(cookBookList);
 
+        logger.debug("getRecentCookings_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
     }
 
@@ -126,7 +129,7 @@ public class CookBookController {
         List<CookBook> cookBookList = cookBookService.getCookBookOrderByCnt(userInfo.getId(), offset, limit);
         clearContent(cookBookList);
 
-
+        logger.debug("getCookingsCountRank_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
     }
 
@@ -148,6 +151,7 @@ public class CookBookController {
         List<CookBook> cookBookList = cookBookService.getGuessLike(userInfo.getId(), offset, limit);
         clearContent(cookBookList);
 
+        logger.debug("getGuessLike_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
     }
 
@@ -164,6 +168,7 @@ public class CookBookController {
 
         Set<String> degrees = cookBookService.getDegreesByUserId(userInfo.getId());
 
+        logger.debug("getDegrees_end,degrees={}", degrees);
         return ApiResult.buildSuccessDataApiResult(degrees);
     }
 
@@ -177,6 +182,7 @@ public class CookBookController {
 
         Set<String> categories = cookBookService.getCategoriesByUserId(userInfo.getId());
 
+        logger.debug("getCategories_end,categories={}", categories);
         return ApiResult.buildSuccessDataApiResult(categories);
     }
 
@@ -190,6 +196,7 @@ public class CookBookController {
 
         Set<String> tags = cookBookService.getTagsByUserId(userInfo.getId());
 
+        logger.debug("getTags_end,tags={}", tags);
         return ApiResult.buildSuccessDataApiResult(tags);
     }
 
@@ -203,6 +210,7 @@ public class CookBookController {
 
         Set<String> materials = cookBookService.getMaterialsByUserId(userInfo.getId());
 
+        logger.debug("getMaterials_end,materials={}", materials);
         return ApiResult.buildSuccessDataApiResult(materials);
     }
 
@@ -214,9 +222,12 @@ public class CookBookController {
         logger.info("getRecentBooks_start,account={},cookBook={}", userInfo.getAccount(), cookBook);
 
         int insertCount = cookBookService.insert(cookBook);
+
+        logger.debug("create_end,insertCount={}", insertCount);
         if (insertCount > 0) {
             return ApiResult.SUCCESS;
         }
+
 
         return ApiResult.buildFailedDataApiResult("创建失败，请重试");
     }
@@ -229,6 +240,8 @@ public class CookBookController {
 
 
         int updateCount = cookBookService.updateById(userInfo.getId(), cookBook);
+        logger.debug("update_end,updateCount={}", updateCount);
+
         if (updateCount > 0) {
             return ApiResult.SUCCESS;
         }
@@ -244,9 +257,12 @@ public class CookBookController {
 
 
         int deleteCount = cookBookService.deleteById(userInfo.getId(), cookBookId);
+        logger.debug("delete_end,deleteCount={}", deleteCount);
+
         if (deleteCount > 0) {
             return ApiResult.SUCCESS;
         }
+
 
         return ApiResult.buildFailedDataApiResult("删除失败，请重试");
     }

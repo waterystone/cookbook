@@ -1,10 +1,10 @@
 package com.adu.cookbook.controller;
 
+import com.adu.cookbook.constants.CookDegreeEnum;
 import com.adu.cookbook.constants.CookieKeyConstant;
 import com.adu.cookbook.model.ApiResult;
 import com.adu.cookbook.model.UserInfo;
 import com.adu.cookbook.service.UserInfoService;
-import com.adu.cookbook.util.JsonUtil;
 import com.adu.cookbook.util.RequestUtil;
 import com.adu.cookbook.util.ResponseUtil;
 import com.adu.cookbook.util.UserContext;
@@ -72,7 +72,7 @@ public class LoginController {
             cookieSeconds = CookieKeyConstant.USER_INFO_LONG_SECONDS;
         }
 
-        ResponseUtil.addCookie(response, CookieKeyConstant.USER_ACCOUNT, JsonUtil.toString(userInfo), cookieSeconds);// 用户信息加入Cookie，标记登陆状态
+        ResponseUtil.addCookie(response, CookieKeyConstant.USER_ACCOUNT, userInfo.getAccount(), cookieSeconds);// 用户信息加入Cookie，标记登陆状态
         return ApiResult.SUCCESS;
     }
 
