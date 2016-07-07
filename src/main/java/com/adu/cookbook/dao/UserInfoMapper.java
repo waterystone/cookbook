@@ -8,9 +8,9 @@ import org.apache.ibatis.annotations.Param;
  * @date 2016/6/29 15:29
  */
 public interface UserInfoMapper {
-    public UserInfo queryUserInfoById(@Param("id") int id);
+     UserInfo queryUserInfoById(@Param("id") int id);
 
-    public UserInfo queryUserInfoByAccount(@Param("account") String account);
+     UserInfo queryUserInfoByAccount(@Param("account") String account);
 
-    public int addUser(@Param("userInfo") UserInfo userInfo);
+     int addUser(@Param("userInfo") UserInfo userInfo);
 }

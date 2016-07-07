@@ -96,7 +96,7 @@ public class UserInfoFilter implements Filter {
         UserInfo res = null;
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        Cookie userCookie = RequestUtil.getCookie(httpServletRequest, CookieKeyConstant.USER_INFO);
+        Cookie userCookie = RequestUtil.getCookie(httpServletRequest, CookieKeyConstant.USER_ACCOUNT);
 
         if (userCookie != null) {
             res = JsonUtil.toObject(userCookie.getValue(), UserInfo.class);

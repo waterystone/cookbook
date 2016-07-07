@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adu.cookbook.dao.CookBookMapper">
+
+	<sql id="baseCols">
+		id, title, user_id, degree, categories, tags, materials, cover_pic, description, html_content, state, create_time, update_time, cnt
+	</sql>
+
+	<select id="queryCookBookById" resultType="com.adu.cookbook.model.CookBook">
+		SELECT
+		<include refid="baseCols" />
+		FROM cook_book
+		WHERE id = #{id}
+	</select>
+
+	<select id="queryCookBookByIds" resultType="com.adu.cookbook.model.CookBook">
+		SELECT
+		<include refid="baseCols" />
+		FROM cook_book
+		WHERE id IN
+				<foreach collection="ids" open="(" close=")" separator="," item="item" index="index">
+					#{item}
+				</foreach>
+	</select>
+
+	<select id="queryCookBookByUserId" resultType="com.adu.cookbook.model.CookBook">
+		SELECT
+		<include refid="baseCols" />
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+		<if test="degree!=null">
+			AND degree = #{degree}
+		</if>
+		<if test="categoriesPattern!=null and categoriesPattern!=''">
+			AND categories REGEXP #{categoriesPattern}
+		</if>
+		<if test="tagsPattern!=null and tagsPattern!=''">
+			AND tags REGEXP #{tagsPattern}
+		</if>
+		<if test="materialsPattern!=null and materialsPattern!=''">
+			AND materials REGEXP #{materialsPattern}
+		</if>
+		<if test="isHasCoverPic == true">
+			AND cover_pic IS NOT EMPTY
+		</if>
+		ORDER BY id DESC
+		LIMIT #{offset},#{limit}
+	</select>
+
+	<select id="queryCookBookOrderByCnt" resultType="com.adu.cookbook.model.CookBook">
+		SELECT
+		<include refid="baseCols" />
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+		ORDER BY cnt DESC
+		LIMIT #{offset},#{limit}
+	</select>
+
+	<select id="queryDegreesByUserId" resultType="int">
+		SELECT DISTINCT degree
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+	</select>
+
+	<select id="queryCategoriesByUserId" resultType="String">
+		SELECT DISTINCT categories
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+	</select>
+
+	<select id="queryTagsByUserId" resultType="String">
+		SELECT DISTINCT tags
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+	</select>
+
+	<select id="queryMaterialsByUserId" resultType="String">
+		SELECT DISTINCT materials
+		FROM cook_book
+		WHERE user_id = #{userId} AND state = 1
+	</select>
+
+	<update id="updateById">
+		UPDATE cook_book
+		SET title = #{cookBook.title}, degree = #{cookBook.degree}, categories = #{cookBook.categories}, tags = #{cookBook.tags}, materials = #{cookBook.materials}, cover_pic = #{cookBook.coverPic}, description = #{cookBook.description}, html_content = #{cookBook.htmlContent}
+		WHERE id = #{cookBook.id} AND user_id = #{userId}
+	</update>
+
+	<update id="addCnt">
+		UPDATE cook_book
+		SET cnt = cnt + #{cnt}
+		WHERE id = #{id} AND user_id = #{userId}
+	</update>
+
+	<insert id="insert">
+		INSERT INTO
+		cook_book(title, user_id, degree, categories, tags, materials, cover_pic, description, html_content)
+		values
+		(#{cookBook.title},#{cookBook.userId},#{cookBook.degree},#{cookBook.categories},#{cookBook.tags},#{cookBook.materials},#{cookBook.coverPic},#{cookBook.description},#{cookBook.htmlContent})
+	</insert>
+
+	<update id="deleteById">
+		UPDATE cook_book
+		SET state = 0
+		WHERE id = #{id} AND user_id = #{userId}
+	</update>
+
+</mapper>

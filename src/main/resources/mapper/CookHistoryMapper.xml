@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.adu.cookbook.dao.CookHistoryMapper">
+
+	<sql id="baseCols">
+		id, user_id, cook_book_id, state, create_time, update_time
+	</sql>
+
+
+	<select id="queryCookHistoryByUserId" resultType="com.adu.cookbook.model.CookHistory">
+		SELECT
+		<include refid="baseCols" />
+		FROM cook_history
+		WHERE user_id = #{userId} AND state = 1
+		<if test="startDate!=null">
+			AND create_time &gt; #{startDate}
+		</if>
+		<if test="endDate!=null">
+			AND create_time &lt; #{endDate}
+		</if>
+		ORDER BY id DESC
+		LIMIT #{offset},#{limit}
+	</select>
+
+
+	<insert id="insert">
+		INSERT INTO
+		cook_history(user_id, cook_book_id)
+		values
+		(#{cookHistory.userId},#{cookHistory.cookBookId})
+	</insert>
+
+	<update id="deleteById">
+		UPDATE cook_history
+		SET state = 0
+		WHERE id = #{id} AND user_id = #{userId}
+	</update>
+
+</mapper>
