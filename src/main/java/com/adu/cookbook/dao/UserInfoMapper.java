@@ -12,5 +12,5 @@ public interface UserInfoMapper {
 
      UserInfo queryUserInfoByAccount(@Param("account") String account);
 
-     int addUser(@Param("userInfo") UserInfo userInfo);
+     int addUser(UserInfo userInfo);
 }

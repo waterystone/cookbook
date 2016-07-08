@@ -17,13 +17,14 @@
     <script src="/js/bootstrap.min.js"></script>
 
     <%--Custom styles for this template--%>
-    <link href="/css/cookbook/login.css" rel="stylesheet">
+    <link href="/css/cookbook.css" rel="stylesheet">
     <%--Custom javascripts for this template--%>
-    <script src="/js/cookbook/login.js"></script>
+    <script src="/js/cookbook.js"></script>
 
 </head>
 
-<body>
+<body class="body-signin">
+
 <div class="container">
 
     <form class="form-signin" role="form">

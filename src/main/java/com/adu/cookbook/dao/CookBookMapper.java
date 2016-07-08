@@ -39,7 +39,7 @@ public interface CookBookMapper {
 
     int addCnt(@Param("userId") int userId, @Param("id") long id, @Param("cnt") int cnt);
 
-    int insert(@Param("cookBook") CookBook cookBook);
+    int insert(CookBook cookBook);
 
     int deleteById(@Param("userId") int userId, @Param("id") long id);
 }

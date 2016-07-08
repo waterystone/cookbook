@@ -1,23 +1,19 @@
 package com.adu.cookbook.controller;
 
+import com.adu.cookbook.biz.CookBookBiz;
 import com.adu.cookbook.model.ApiResult;
 import com.adu.cookbook.model.CookBook;
-import com.adu.cookbook.model.CookHistory;
 import com.adu.cookbook.model.UserInfo;
 import com.adu.cookbook.service.CookBookService;
 import com.adu.cookbook.service.CookHistoryService;
 import com.adu.cookbook.util.UserContext;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.Set;
@@ -31,9 +27,11 @@ import java.util.Set;
 public class CookBookController {
     @Autowired
     private CookBookService cookBookService;
-
     @Autowired
     private CookHistoryService cookHistoryService;
+    @Autowired
+    private CookBookBiz cookBookBiz;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -50,9 +48,7 @@ public class CookBookController {
         UserInfo userInfo = UserContext.getUserInfo();
         logger.info("getSlides_start,account={}", userInfo.getAccount());
 
-
-        List<CookBook> cookBookList = cookBookService.getCookBookByUserId(userInfo.getId(), null, null, null, null, true, offset, limit);
-        clearContent(cookBookList);
+        List<CookBook> cookBookList = cookBookBiz.getSlides(userInfo.getId(), offset, limit);
 
         logger.debug("getSlides_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
@@ -73,9 +69,7 @@ public class CookBookController {
         UserInfo userInfo = UserContext.getUserInfo();
         logger.info("getRecentBooks_start,account={}", userInfo.getAccount());
 
-
-        List<CookBook> cookBookList = cookBookService.getCookBookByUserId(userInfo.getId(), null, null, null, null, false, offset, limit);
-        clearContent(cookBookList);
+        List<CookBook> cookBookList = cookBookBiz.getRecentBooks(userInfo.getId(), offset, limit);
 
         logger.debug("getRecentBooks_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
@@ -95,17 +89,7 @@ public class CookBookController {
         UserInfo userInfo = UserContext.getUserInfo();
         logger.info("getRecentCookings_start,account={}", userInfo.getAccount());
 
-
-        List<CookHistory> cookHistoryList = cookHistoryService.getCookHistoryByUserId(userInfo.getId(), null, null, offset, limit);
-        List<Long> cookBookIdList = Lists.transform(cookHistoryList, new Function<CookHistory, Long>() {
-            @Override
-            public Long apply(CookHistory input) {
-                return input.getCookBookId();
-            }
-        });
-        List<CookBook> cookBookByIds = cookBookService.getCookBookByIds(cookBookIdList);
-        List<CookBook> cookBookList = cookBookByIds;
-        clearContent(cookBookList);
+        List<CookBook> cookBookList = cookBookBiz.getRecentCookings(userInfo.getId(), offset, limit);
 
         logger.debug("getRecentCookings_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
@@ -125,9 +109,7 @@ public class CookBookController {
         UserInfo userInfo = UserContext.getUserInfo();
         logger.info("getCookingsCountRank_start,account={}", userInfo.getAccount());
 
-
-        List<CookBook> cookBookList = cookBookService.getCookBookOrderByCnt(userInfo.getId(), offset, limit);
-        clearContent(cookBookList);
+        List<CookBook> cookBookList = cookBookBiz.getCookingCountRank(userInfo.getId(), offset, limit);
 
         logger.debug("getCookingsCountRank_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
@@ -147,9 +129,7 @@ public class CookBookController {
         UserInfo userInfo = UserContext.getUserInfo();
         logger.info("getGuessLike_start,account={}", userInfo.getAccount());
 
-
-        List<CookBook> cookBookList = cookBookService.getGuessLike(userInfo.getId(), offset, limit);
-        clearContent(cookBookList);
+        List<CookBook> cookBookList = cookBookBiz.getGuessLike(userInfo.getId(), offset, limit);
 
         logger.debug("getGuessLike_end,cookBookList={}", cookBookList);
         return ApiResult.buildSuccessDataApiResult(cookBookList);
@@ -214,18 +194,48 @@ public class CookBookController {
         return ApiResult.buildSuccessDataApiResult(materials);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    @RequestMapping(value = "/bookList", method = RequestMethod.GET)
+    public ModelAndView getBookList(Model model) {
+        UserInfo userInfo = UserContext.getUserInfo();
+        logger.info("getBookList_start,account={}", userInfo.getAccount());
+
+        List<CookBook> cookBookList = cookBookService.getCookBookByUserId(userInfo.getId(), null, null, null, null, false, 0, Integer.MAX_VALUE);
+        logger.debug("getBookList_end,cookBookList={}", cookBookList);
+
+        model.addAttribute("cookBookList", cookBookList);
+
+        return new ModelAndView("book/bookList");
+    }
+
+    @RequestMapping(value = "/book/{cookBookId:\\d+}", method = RequestMethod.GET)
+    public ModelAndView getBook(Model model, @PathVariable(value = "cookBookId") long cookBookId) {
+        UserInfo userInfo = UserContext.getUserInfo();
+        logger.info("getBook_start,account={},cookBookId={}", userInfo.getAccount(), cookBookId);
+
+        CookBook cookBook = cookBookService.getCookBookById(cookBookId);
+        logger.debug("getBook_end,cookBook={}", cookBook);
+
+        if (cookBook != null && cookBook.getUserId() != userInfo.getId()) {
+            model.addAttribute("errorMsg", "无权查看该文");
+        } else {
+            model.addAttribute("cookBook", cookBook);
+        }
+
+        return new ModelAndView("book/book");
+    }
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public ApiResult create(CookBook cookBook) {
         UserInfo userInfo = UserContext.getUserInfo();
         cookBook.setUserId(userInfo.getId());//填充用户ID
-        logger.info("getRecentBooks_start,account={},cookBook={}", userInfo.getAccount(), cookBook);
+        logger.info("create_start,account={},cookBook={}", userInfo.getAccount(), cookBook);
 
         int insertCount = cookBookService.insert(cookBook);
 
         logger.debug("create_end,insertCount={}", insertCount);
         if (insertCount > 0) {
-            return ApiResult.SUCCESS;
+            return ApiResult.buildSuccessDataApiResult(cookBook.getId());
         }
 
 
@@ -267,28 +277,5 @@ public class CookBookController {
         return ApiResult.buildFailedDataApiResult("删除失败，请重试");
     }
 
-    /**
-     * @param cookBookList
-     */
-    private void clearContent(List<CookBook> cookBookList) {
-        if (CollectionUtils.isEmpty(cookBookList)) {
-            return;
-        }
-        for (CookBook cookBook : cookBookList) {
-            clearContent(cookBook);
-        }
-    }
-
-    /**
-     * 清空食谱的具体内容，在一些列表页展示时并不需要，以减少数据传输
-     *
-     * @param cookBook
-     */
-    private void clearContent(CookBook cookBook) {
-        if (cookBook == null) {
-            return;
-        }
-        cookBook.setHtmlContent(null);
-    }
 
 }

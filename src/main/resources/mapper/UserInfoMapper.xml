@@ -21,11 +21,11 @@
 		WHERE account = #{account}
 	</select>
 
-	<insert id="addUser">
+	<insert id="addUser" parameterType="com.adu.cookbook.model.UserInfo" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO
 		user_info(user_name, sex, mobile, account, password)
 		values
-		(#{userInfo.userName},#{userInfo.sex},#{userInfo.mobile},#{userInfo.account},#{userInfo.password})
+		(#{userName},#{sex},#{mobile},#{account},#{password})
 	</insert>
 
 </mapper>

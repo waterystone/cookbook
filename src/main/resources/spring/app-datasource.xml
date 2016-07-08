@@ -8,24 +8,11 @@
 
     <context:property-placeholder location="classpath:jdbc.properties" />
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-          destroy-method="close">
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${mysql.jdbc.driverClassName}" />
         <property name="url" value="${mysql.jdbc.url}" />
         <property name="username" value="${mysql.jdbc.username}" />
         <property name="password" value="${mysql.jdbc.password}" />
-        <property name="maxActive" value="300" />
-        <property name="maxIdle" value="10" />
-        <property name="maxWait" value="5000" />
-        <property name="logAbandoned" value="true" />
-        <property name="removeAbandoned" value="true" />
-        <property name="removeAbandonedTimeout" value="60" />
-        <property name="testWhileIdle" value="true" />
-        <property name="validationQuery" value="select 1" />
-        <!-- <property name="validationQueryTimeout" value="1"/> -->
-        <property name="timeBetweenEvictionRunsMillis" value="5000" />
-        <property name="testOnBorrow" value="true" />
-        <property name="testOnReturn" value="true" />
     </bean>
 
     <!-- session factory -->

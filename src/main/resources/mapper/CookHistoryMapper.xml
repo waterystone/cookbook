@@ -24,11 +24,11 @@
 	</select>
 
 
-	<insert id="insert">
+	<insert id="insert" parameterType="com.adu.cookbook.model.CookHistory" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO
 		cook_history(user_id, cook_book_id)
 		values
-		(#{cookHistory.userId},#{cookHistory.cookBookId})
+		(#{userId},#{cookBookId})
 	</insert>
 
 	<update id="deleteById">

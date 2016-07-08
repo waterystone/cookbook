@@ -21,9 +21,8 @@
 
 		<org.springframework.version>4.2.2.RELEASE</org.springframework.version>
 		<aspectjweaver.version>1.7.4</aspectjweaver.version>
-		<commons-dbcp.version>1.4</commons-dbcp.version>
 		<mysql.version>5.1.29</mysql.version>
-		<org.mybatis.version>3.1.1</org.mybatis.version>
+		<org.mybatis.version>3.2.5</org.mybatis.version>
 		<mybatis.version>1.2.3</mybatis.version>
 
 		<javax.servlet.version>3.0-alpha-1</javax.servlet.version>
@@ -123,12 +122,6 @@
 			<version>${aspectjweaver.version}</version>
 		</dependency>
 
-		<!-- DataSource依赖此jar包 -->
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>${commons-dbcp.version}</version>
-		</dependency>
 
 		<!-- mysql驱动 -->
 		<dependency>

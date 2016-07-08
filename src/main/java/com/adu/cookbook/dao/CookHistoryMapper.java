@@ -17,7 +17,7 @@ public interface CookHistoryMapper {
                                                @Param("offset") int offset,
                                                @Param("limit") int limit);
 
-    int insert(@Param("cookHistory") CookHistory cookHistory);
+    int insert(CookHistory cookHistory);
 
     int deleteById(@Param("userId")int userId, @Param("id") long id);
 }

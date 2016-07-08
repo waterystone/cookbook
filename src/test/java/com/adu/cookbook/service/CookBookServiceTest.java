@@ -124,7 +124,6 @@ public class CookBookServiceTest extends BaseTest {
 
     private CookBook buildCookBook() {
         CookBook res = new CookBook();
-        res.setId(1);
         res.setTitle("title-test");
         res.setUserId(1);
         res.setDegree(3);
